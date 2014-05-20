@@ -1,0 +1,48 @@
+<div class="title">
+  <h1>YoutubeExtractor</h1>
+</div>
+<div ng-controller="SearchController">
+  <div class="search-container">
+    <form name="searchForm" class="form-inline" role="form">
+      <fieldset>
+        <legend ng-show="isFirstAccess">Please input parse url which include YouTube videos.</legend>
+        <div class="form-group">
+          <label class="sr-only" for="search-url-text">Seaerch URL</label>
+          <input type="text" ng-model="searchUrl" placeholder="http://www..." class="form-control" id="search-url-text" size="60" required>
+        </div>
+        <button type="button" class="btn btn-primary" ng-click="submit()" ng-disabled="isInvalidForm">
+          Search <span class="glyphicon glyphicon-search"></span>
+        </button>
+      </fieldset>
+    </form>
+  </div><!-- search-container -->
+  <div class="main-container">
+    <div class="loading" ng-show="isLoading">
+      <%= image_tag 'loading.gif', alt: "loading", width: 200 %>
+    </div><!-- loading -->
+    <div class="alert alert-{{ messageClass }} fade in" ng-show="message.length">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      {{ message }}
+    </div><!-- message-container -->
+    <div class="search-result-container" ng-show="!isLoading && youtubeVideos.length">
+      <div class="playlist-container opacity-container">
+        <p ng-show="searchdUrl.length">{{ searchdUrl }} の検索結果</p>
+        <ul>
+          <li ng-click="playVideo($index)" ng-repeat="youtubeVideo in youtubeVideos">
+            <div class="video-container">
+              <img ng-src="http://img.youtube.com/vi/{{youtubeVideo.id}}/2.jpg" />
+              <div class="video-title">
+                {{ youtubeVideo.title }}
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div><!-- playlist-container -->
+      <div class="player-container opacity-container">
+        <div class="video-wrapper">
+          <div id="player"></div>
+        </div><!-- video-wrapper -->
+      </div><!-- player-contaienr -->
+    </div><!-- search-result-container -->
+  </div><!-- main-container -->
+</div><!-- SearchController -->
