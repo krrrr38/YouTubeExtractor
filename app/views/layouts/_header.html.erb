@@ -1,7 +1,44 @@
 <nav class="navbar navbar-default" role="navigation">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">YoutubeExtractor</a>
-    </div>
-  </div><!-- container-fluid -->
+  <div class="container">
+    <a class="navbar-brand" href="#">YouTubeExtractor</a>
+    <ul class="nav navbar-right">
+      <li>
+        <% if user_signed_in? %>
+          current_user: <%= current_user.name %>
+          <%= link_to "Sign out", destroy_user_session_path, class: "btn btn-default", :confirm => "Are you sure?", "data-no-turbolink" => true %>
+        <% else %>
+          <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#auth-modal">Sign in</button>
+        <% end %>
+      </li>
+    </ul>
+  </div><!-- container -->
 </nav>
+
+<div class="modal fade" id="auth-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Authorization</h4>
+      </div><!-- modal-header -->
+      <div class="modal-body">
+        <h4>Authorization with YouTubeExtractor</h4>
+        <%= image_tag 'playlist-edit.png', alt: "playlist-edit", id: "auth-playlist-edit" %>
+        <div class="what-we-want">
+          What we want to do...
+        </div>
+        <div>
+          <span>YouTube Extractor needs...</span>
+          <ul>
+            <li><span class="glyphicon glyphicon-circle-arrow-right"></span> Google Plus User Information Read</li>
+            <li><span class="glyphicon glyphicon-circle-arrow-right"></span> YouTube Playlist Read and Write</li>
+          </ul>
+          <%= link_to image_tag('google-plus-icon.png', alt: "google-plus-authorization", height: 35) + "Authorize", user_omniauth_authorize_path(:google), type: "button", class: "btn btn-danger" %>
+        </div><!-- auth-submit-container -->
+        <div class="expire-notice-container">
+          <span class="glyphicon glyphicon-ok"></span> If expiring authorization, please try again.
+        </div><!-- expire-notice-container -->
+      </div><!-- modal-body -->
+    </div><!-- modal-content -->
+  </div><!-- modal-dialog -->
+</div><!-- auth-modal -->

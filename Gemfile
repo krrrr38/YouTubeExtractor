@@ -20,9 +20,9 @@ gem 'faraday_middleware'
 gem 'parallel'
 gem 'nokogiri'
 
-group :doc do
-  gem 'sdoc', '~> 0.4.0'
-end
+gem 'rails_config'
+gem 'devise'
+gem 'omniauth-google-oauth2'
 
 group :development, :test do
   gem 'spring'
@@ -38,6 +38,9 @@ group :development do
   gem 'pry-rails'
   gem 'awesome_print'
   gem 'hirb'
+  gem 'annotate'
+  gem 'bullet'
+  gem 'rack-mini-profiler'
 end
 
 group :test do

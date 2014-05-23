@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: pages
+#
+#  id           :integer          not null, primary key
+#  url          :string(255)
+#  is_exist     :boolean          default(FALSE)
+#  extracted_at :datetime
+#  created_at   :datetime
+#  updated_at   :datetime
+#
+
 require 'spec_helper'
 
 describe Page do

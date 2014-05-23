@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: videos
+#
+#  id            :integer          not null, primary key
+#  title         :string(255)      default("")
+#  youtube_id    :string(255)      not null
+#  is_embed      :boolean          default(FALSE)
+#  can_auto_play :boolean          default(FALSE)
+#  is_syndicate  :boolean          default(FALSE)
+#  is_exist      :boolean          default(FALSE)
+#  created_at    :datetime
+#  updated_at    :datetime
+#
+
 class Video < ActiveRecord::Base
   has_many :video_relations
   validates :youtube_id, presence: true

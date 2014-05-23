@@ -30,3 +30,6 @@ config/secrets.yml
 /app/assets/stylesheets/.sass-cache
 
 *~
+config/settings.local.yml
+config/settings/*.local.yml
+config/environments/*.local.yml

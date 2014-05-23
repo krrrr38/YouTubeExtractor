@@ -8,6 +8,37 @@ body {
     text-align: center
 }
 
+.modal-body {
+    text-align: center;
+    div {
+        margin: 5px;
+        padding: 10px;
+    }
+    #auth-playlist-edit {
+        width: 90%;
+        margin: 10px;
+    }
+    .what-we-want {
+        margin: 0 20px;
+        background-color: #ffefff;
+        border: 3px #EEE solid;
+        -moz-border-radius: 10px;
+        -webkit-border-radius: 10px;
+        border-radius: 10px;
+        border-style: dotted;
+    }
+    li {
+        list-style-type: none;
+    }
+}
+
+.alert-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 10px;
+}
+
 .container {
     max-width: 950px;
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140522131839) do
+ActiveRecord::Schema.define(version: 20140523213544) do
 
   create_table "pages", force: true do |t|
     t.string   "url"
@@ -22,6 +22,29 @@ ActiveRecord::Schema.define(version: 20140522131839) do
   end
 
   add_index "pages", ["url"], name: "index_pages_on_url", unique: true, using: :btree
+
+  create_table "users", force: true do |t|
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",       default: 0,     null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.string   "uid",                                 null: false
+    t.string   "name"
+    t.string   "password"
+    t.string   "email",               default: ""
+    t.string   "image_path",          default: ""
+    t.string   "token",                               null: false
+    t.string   "refresh_token",                       null: false
+    t.datetime "expires_at"
+    t.boolean  "expires"
+    t.boolean  "admin",               default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "users", ["uid"], name: "index_users_on_uid", unique: true, using: :btree
 
   create_table "video_relations", force: true do |t|
     t.integer  "page_id",    null: false
