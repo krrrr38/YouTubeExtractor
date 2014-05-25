@@ -1,11 +1,10 @@
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default mynavbar" role="navigation">
   <div class="container">
     <a class="navbar-brand" href="#">YouTubeExtractor</a>
     <ul class="nav navbar-right">
       <li>
         <% if user_signed_in? %>
-          current_user: <%= current_user.name %>
-          <%= link_to "Sign out", destroy_user_session_path, class: "btn btn-default", :confirm => "Are you sure?", "data-no-turbolink" => true %>
+          <%= link_to "Sign out", destroy_user_session_path, class: "btn btn-default navbar-btn sign-out-button", :data => {:confirm => "Are you sure?"}, "data-no-turbolink" => true %>
         <% else %>
           <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#auth-modal">Sign in</button>
         <% end %>

@@ -15,6 +15,8 @@ gem 'angularjs-rails'
 gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 
+gem 'activerecord-import'
+
 gem 'faraday'
 gem 'faraday_middleware'
 gem 'parallel'
@@ -23,6 +25,8 @@ gem 'nokogiri'
 gem 'rails_config'
 gem 'devise'
 gem 'omniauth-google-oauth2'
+
+gem 'youtube_it', '~> 2.4.0'
 
 group :development, :test do
   gem 'spring'
@@ -52,6 +56,7 @@ group :test do
   gem 'selenium-webdriver'
   gem 'capybara'
   gem 'factory_girl_rails'
+  gem 'database_cleaner'
 end
 
 group :production do

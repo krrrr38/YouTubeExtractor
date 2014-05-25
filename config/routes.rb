@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 Rails.application.routes.draw do
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   devise_scope :user do
@@ -5,7 +6,10 @@ Rails.application.routes.draw do
   end
 
   namespace :api, defaults: {format: :json} do
-    get 'extractor/get'
+    get    'extractor/get'
+    resources :playlists, only: [:index, :create, :show, :destroy]
+    match  '/playlists/:id', to: 'playlists#add_video', via: 'post' # add video into playlist
+    match  '/playlists/:id/:entry_id', to: 'playlists#delete_video', via: 'delete' # delete video from playlist
   end
 
   root 'extractors#index'

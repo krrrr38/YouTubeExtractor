@@ -48,13 +48,13 @@ class User < ActiveRecord::Base
       expires:    cred["expires"]
     }
 
+    refresh_token = cred["refresh_token"]
+    columns[:refresh_token] = refresh_token if refresh_token
+
     if user
       user.update_attributes(columns)
     else
-      columns.merge!(
-        uid:           access_token["uid"],
-        refresh_token: cred["refresh_token"]
-      )
+      columns[:uid] = access_token["uid"]
       user = User.create(columns)
     end
     user

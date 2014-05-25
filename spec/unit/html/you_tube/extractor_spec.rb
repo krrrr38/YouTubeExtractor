@@ -15,7 +15,7 @@ describe HTML::YouTube::Extractor do
 
   describe "with normal html include youtube videos" do
     before do
-      body = IO.read("./spec/data/html/you_tube/extractor.html")
+      body = IO.read("./spec/data/html/parse/extractor.html")
       @parse_result = extractor.extract_ids(body)
     end
 

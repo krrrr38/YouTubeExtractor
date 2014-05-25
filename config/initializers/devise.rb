@@ -230,12 +230,12 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
-  config.omniauth :google_oauth2, Settings.google_oauth2.client_id, Settings.google_oauth2.client_secret,  {
+  config.omniauth :google_oauth2, Settings.google.client_id, Settings.google.client_secret,  {
     :name => "google",
     :scope => "email,profile,plus.me,http://gdata.youtube.com",
     :prompt => "select_account",
     :access_type => "offline",
-    :approval_prompt => "force"
+    :approval_prompt => "auto"
   }
 
   # ==> Warden configuration

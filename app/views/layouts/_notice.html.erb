@@ -1,0 +1,18 @@
+<div class="notice-container">
+  <% if notice then %>
+    <div class="alert alert-info fade in" ng-show="notice.keepFlush">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <%= notice %>
+    </div>
+  <% end %>
+  <% if alert then %>
+    <div class="alert alert-danger fade in" ng-show="notice.keepFlush">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <%= alert %>
+    </div>
+  <% end %>
+  <div class="alert alert-{{notice.messageClass}} fade in" ng-show="notice.message.length">
+    {{notice.message}}
+    <%= link_to image_tag('google-plus-icon.png', alt: "google-plus-authorization", height: 35) + "Authorize", user_omniauth_authorize_path(:google), type: "button", class: "btn btn-danger", "ng-show" => "{{notice.messageClass == \"danger\"}}" %>
+  </div>
+</div>

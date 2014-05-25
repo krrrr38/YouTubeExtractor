@@ -7,7 +7,7 @@ describe Api::ExtractorController do
 
     describe "without url parameter" do
       it "returns http bad_request" do
-        get :get, format: :json
+        xhr :get, :get, format: :json
         response.should be_bad_request
         body = JSON.parse(response.body)
         body["message"].should eq "Invalid Argument"
@@ -18,7 +18,7 @@ describe Api::ExtractorController do
       let (:unexist_url) { sprintf("http://%s.example.com/youtubes", random_string) }
       before do
         stub_request(:get, unexist_url).to_return({:body => "", :status => 404})
-        get :get, format: :json, url: unexist_url
+        xhr :get, :get, format: :json, url: unexist_url
       end
 
       describe "response" do
@@ -39,7 +39,7 @@ describe Api::ExtractorController do
 
     describe "extract non url param" do
       let (:non_url) { random_string }
-      before { get :get, format: :json, url: non_url }
+      before { xhr :get, :get, format: :json, url: non_url }
 
       describe "response" do
         it { response.should be_bad_request }
@@ -60,7 +60,7 @@ describe Api::ExtractorController do
       let (:unparsed_url) { sprintf("http://%s.example.com/youtubes", random_string) }
       before do
         stub_request(:get, unparsed_url).to_return({:body => "<htm", :status => 200})
-        get :get, format: :json, url: unparsed_url
+        xhr :get, :get, format: :json, url: unparsed_url
       end
 
       describe "response" do
@@ -89,7 +89,7 @@ describe Api::ExtractorController do
         video_search_response = IO.read("./spec/data/html/you_tube/video_search.json")
         stub_request(:get, "https://gdata.youtube.com/feeds/api/videos/#{youtube_id}?alt=json&v=2")
           .to_return({:body => video_search_response, :status => 200})
-        get :get, format: :json, url: parsed_url
+        xhr :get, :get, format: :json, url: parsed_url
       end
 
       describe "response" do

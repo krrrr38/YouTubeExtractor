@@ -1,4 +1,7 @@
-angular.module('youtube-extractor', ['youtube-extractor-controllers'])
+angular.module('youtube-extractor', ['youtube-extractor-controllers', 'youtube-extractor-directives'])
+    .config(["$httpProvider", function(provider) {
+        provider.defaults.headers.common["X-CSRF-Token"] = $("meta[name=csrf-token]").attr("content");
+    }])
     .run([function(){
         var script = document.createElement('script');
         script.src = "https://www.youtube.com/iframe_api";
@@ -7,7 +10,7 @@ angular.module('youtube-extractor', ['youtube-extractor-controllers'])
     }]);
 
 angular.module('youtube-extractor-controllers', ['youtube-extractor-services'])
-    .controller('SearchController', ['$window', '$scope', 'ExtractService', 'YoutubePlayer', 'Playlist', function($window, $scope, extractor, player, playlist){
+    .controller('SearchController', ['$scope', 'ExtractService', 'AlertPopup', 'NoticePopup', 'YoutubePlayer', 'Playlist', function($scope, extractor, alert, notice, player, playlist){
         $scope.searchUrl = '';
         $scope.isInvalidForm = true;
         $scope.isLoading = false;
@@ -16,8 +19,9 @@ angular.module('youtube-extractor-controllers', ['youtube-extractor-services'])
         $scope.searchdUrl = '';
         $scope.youtubeVideos = [];
 
-        $scope.messageClass = '';
-        $scope.message = '';
+        $scope.alert = alert;
+        $scope.notice = notice;
+        notice.openFlush();
 
         player.setPlaylist(playlist);
 
@@ -27,13 +31,13 @@ angular.module('youtube-extractor-controllers', ['youtube-extractor-services'])
         });
 
         $scope.submit = function() {
+            $scope.isInvalidForm = true;
             $scope.showMessage = false;
             $scope.isLoading = true;
             extractor.search($scope.searchUrl).then(function(data) {
-                $scope.searchdUrl   = data.data.url;
-                $scope.youtubeVideos   = data.data.videos;
-                $scope.message      = data.data.message;
-                $scope.messageClass = "info";
+                $scope.searchdUrl    = data.data.url;
+                $scope.youtubeVideos = data.data.videos;
+                alert.show(data.data.message, 'info');
                 if ($scope.youtubeVideos.length > 0) {
                     $scope.isFirstAccess = false;
                     playlist.clear();
@@ -41,15 +45,101 @@ angular.module('youtube-extractor-controllers', ['youtube-extractor-services'])
                     player.start();
                 }
             }, function(data) {
-                $scope.message      = data.data.message;
-                $scope.messageClass = "danger";
+                alert.show(data.data.message, 'danger');
             }).then(function() {
                 $scope.isLoading = false;
+                $scope.isInvalidForm = false;
             });
         };
 
         $scope.playVideo = function(index) {
             player.playWithIndex(index);
+        };
+    }])
+    .controller('YoutubeController', ['$scope', '$window', 'YoutubeService', 'Playlist', 'NoticePopup', function($scope, $window, youtube, playlist, notice){
+        youtube.playlists().then(function(data) {
+            // playlist: {"id": "", "title": "", "description": ""}
+            $scope.playlists = data.data.playlists;
+        }, function(data) {
+            notice.show(data.data.message, 'danger', data.data.reload);
+        });
+
+        $scope.updatePlaylist = function() {
+            if ($scope.playlist) {
+                youtube.playlist($scope.playlist.id).then(function(data) {
+                    // video: {"id": "", title: "", "description": "", "playlist_entry_id": ""}
+                    $scope.videos = data.data.videos;
+                }, function(data) {
+                    notice.show(data.data.message, 'danger');
+                });
+            }
+        };
+
+        $scope.playPlaylist = function() {
+            if ($scope.videos[0]) {
+                var playPlaylistLink = "https://www.youtube.com/watch?v=" + $scope.videos[0].id + "&list=" + $scope.playlist.id;
+                $window.open(playPlaylistLink);
+            }
+        };
+
+        $scope.createPlaylist = function() {
+            youtube.create($scope.newPlaylistTitle, $scope.newPlaylistDescription).then(function(data) {
+                $scope.playlists.push({
+                    id: data.data.id,
+                    title: data.data.title,
+                    description: data.data.description
+                });
+                notice.show(data.data.message, 'info');
+            }, function(data) {
+                notice.show(data.data.message, 'danger');
+            });
+        };
+
+        $scope.deletePlaylist = function(playlistId, index) {
+            var playlist = $scope.playlists.splice(index, 1);
+            youtube.delete(playlistId).then(function(data) {
+                notice.show(data.data.message, 'info');
+            }, function(data) {
+                notice.show(data.data.message, 'danger');
+                $scope.playlists.push(playlist);
+            });
+        };
+
+        $scope.addVideo = function() {
+            var playingVideoId = playlist.currentVideo().id;
+            if ($scope.playlist && playingVideoId) {
+                youtube.add($scope.playlist, playingVideoId).then(function(data) {
+                    $scope.videos.push({
+                        id: data.data.id,
+                        title: data.data.title,
+                        description: "",
+                        playlist_entry_id: data.data.playlist_entry_id
+                    });
+                    notice.show(data.data.message, 'info');
+                }, function(data) {
+                    var message = data.data.message;
+                    notice.show(message, 'danger');
+                    if (!message.match(/.*ResourceNotFound.*/)) {
+                        $scope.playlists.push(playlist);
+                    }
+                });
+            } else {
+                notice.show("playlist or playing video has not set yet.", 'danger');
+            };
+        };
+
+        $scope.removeVideo = function(entryId, index) {
+            if ($scope.playlist && entryId) {
+                var video = $scope.videos.splice(index, 1);
+                youtube.remove($scope.playlist.id, entryId).then(function(data) {
+                    notice.show(data.data.message, 'info');
+                }, function(data) {
+                    notice.show(data.data.message, 'danger');
+                    $scope.videos.push(playlist);
+                });
+            } else {
+                notice.show("playlist has not set yet.", 'danger');
+            };
         };
     }]);
 
@@ -67,6 +157,91 @@ angular.module('youtube-extractor-services', [])
             }
         };
     })
+    .factory('YoutubeService', function($http) {
+        return {
+            playlists: function() {
+                return $http({
+                    method: 'GET',
+                    url: '/api/playlists.json'
+                });
+            },
+            create: function(title, description) {
+                return $http({
+                    method: 'POST',
+                    url: '/api/playlists.json',
+                    data: {
+                        title: title,
+                        description: description
+                    }
+                });
+            },
+            playlist: function(playlistId) {
+                return $http({
+                    method: 'GET',
+                    url: '/api/playlists/' + playlistId + '.json'
+                });
+            },
+            delete: function(playlistId) {
+                return $http({
+                    method: 'DELETE',
+                    url: '/api/playlists/' + playlistId + '.json'
+                });
+            },
+            add: function(playlist, videoId) {
+                return $http({
+                    method: 'POST',
+                    url: '/api/playlists/' + playlist.id + '.json',
+                    data: {
+                        playlist_title: playlist.title,
+                        video_id: videoId
+                    }
+                });
+            },
+            remove: function(playlistId, entryId) {
+                return $http({
+                    method: 'DELETE',
+                    url: '/api/playlists/' + playlistId + '/' + entryId + '.json'
+                });
+            }
+        };
+    })
+    .factory('AlertPopup', ['$timeout', function($timeout) {
+        var self = {
+            message: "",
+            messageClass: ""
+        };
+        self.show = function(message, messageClass) {
+            self.message = message;
+            self.messageClass = messageClass;
+            $timeout(function() {
+                self.message = "";
+            }, 10000);
+        };
+        return self;
+    }])
+    .factory('NoticePopup', ['$timeout', function($timeout) {
+        var self = {
+            message: "",
+            messageClass: "",
+            keepFlush: true
+        };
+        self.openFlush = function() {
+            self.keepFlush = true;
+            $timeout(function() {
+                self.keepFlush = false;
+            }, 8000);
+        };
+        self.show = function(message, messageClass, keep) {
+            self.message = message;
+            self.messageClass = messageClass;
+            if (!keep) {
+                $timeout(function() {
+                    self.message = "";
+                }, 8000);
+            }
+        };
+        return self;
+    }])
     .factory('YoutubePlayer', ['$timeout', function($timeout) {
         var self = {
             state: -2,
@@ -149,3 +324,19 @@ angular.module('youtube-extractor-services', [])
         };
         return self;
     });
+
+angular.module('youtube-extractor-directives', [])
+    .directive('ngConfirmClick', [
+        function(){
+            return {
+                link: function (scope, element, attr) {
+                    var msg = attr.ngConfirmClick || "Are you sure?";
+                    var clickAction = attr.confirmedClick;
+                    element.bind('click',function (event) {
+                        if ( window.confirm(msg) ) {
+                            scope.$eval(clickAction);
+                        }
+                    });
+                }
+            };
+    }]);

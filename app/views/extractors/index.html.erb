@@ -2,47 +2,147 @@
   <h1>YoutubeExtractor</h1>
 </div>
 <div ng-controller="SearchController">
-  <div class="search-container">
-    <form name="searchForm" class="form-inline" role="form">
-      <fieldset>
-        <legend ng-show="isFirstAccess">Please input parse url which include YouTube videos.</legend>
-        <div class="form-group">
-          <label class="sr-only" for="search-url-text">Seaerch URL</label>
-          <input type="text" ng-model="searchUrl" placeholder="http://www..." class="form-control" id="search-url-text" size="60" required>
-        </div>
-        <button type="button" class="btn btn-primary" ng-click="submit()" ng-disabled="isInvalidForm">
-          Search <span class="glyphicon glyphicon-search"></span>
-        </button>
-      </fieldset>
-    </form>
-  </div><!-- search-container -->
-  <div class="main-container">
-    <div class="loading" ng-show="isLoading">
-      <%= image_tag 'loading.gif', alt: "loading", width: 200 %>
-    </div><!-- loading -->
-    <div class="alert alert-{{ messageClass }} fade in" ng-show="message.length">
-      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-      {{ message }}
-    </div><!-- message-container -->
-    <div class="search-result-container" ng-show="!isLoading && youtubeVideos.length">
-      <div class="playlist-container opacity-container">
-        <p ng-show="searchdUrl.length">{{ searchdUrl }} の検索結果</p>
-        <ul>
-          <li ng-click="playVideo($index)" ng-repeat="youtubeVideo in youtubeVideos">
-            <div class="video-container">
-              <img ng-src="http://img.youtube.com/vi/{{youtubeVideo.id}}/2.jpg" />
-              <div class="video-title">
-                {{ youtubeVideo.title }}
-              </div>
+  <%= render 'layouts/notice' %>
+  <div class="wrap-container row">
+    <div class="main-container<%= user_signed_in? ? " col-md-9" : "" %>">
+      <div class="search-container">
+        <form name="searchForm" class="form-inline" role="form">
+          <fieldset>
+            <legend ng-show="isFirstAccess">Please input parse url which include YouTube videos.</legend>
+            <div class="form-group">
+              <label class="sr-only" for="search-url-text">Seaerch URL</label>
+              <input type="text" ng-model="searchUrl" placeholder="http://www..." class="form-control" id="search-url-text" size="60" required>
             </div>
-          </li>
-        </ul>
-      </div><!-- playlist-container -->
-      <div class="player-container opacity-container">
-        <div class="video-wrapper">
-          <div id="player"></div>
-        </div><!-- video-wrapper -->
-      </div><!-- player-contaienr -->
-    </div><!-- search-result-container -->
-  </div><!-- main-container -->
-</div><!-- SearchController -->
+            <button type="button" class="btn btn-primary" ng-click="submit()" ng-disabled="isInvalidForm">
+              Search <span class="glyphicon glyphicon-search"></span>
+            </button>
+          </fieldset>
+        </form>
+      </div><!-- search-container -->
+      <div class="loading" ng-show="isLoading">
+        <%= image_tag 'loading.gif', alt: "loading", width: 200 %>
+      </div><!-- loading -->
+      <div class="alert alert-{{ alert.messageClass }} fade in" ng-show="alert.message.length">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        {{ alert.message }}
+      </div><!-- message-container -->
+      <div class="search-result-container" ng-show="!isLoading && youtubeVideos.length">
+        <div class="playlist-container opacity-container">
+          <p ng-show="searchdUrl.length">Found available videos in {{ searchdUrl }}</p>
+          <ul>
+            <li ng-click="playVideo($index)" ng-repeat="youtubeVideo in youtubeVideos">
+              <div class="video-container">
+                <img ng-src="http://img.youtube.com/vi/{{youtubeVideo.id}}/2.jpg" />
+                <div class="video-title">
+                  {{ youtubeVideo.title }}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div><!-- playlist-container -->
+        <div class="player-container opacity-container">
+          <div class="video-wrapper">
+            <div id="player"></div>
+          </div><!-- video-wrapper -->
+        </div><!-- player-contaienr -->
+      </div><!-- search-result-container -->
+    </div><!-- main-container -->
+    <% if user_signed_in? %>
+      <div class="youtube-container col-md-3" ng-controller="YoutubeController">
+        <div class="opacity-container playlist-selector">
+          <p>
+            Logged in as <%= current_user.name %>
+          </p>
+          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create-playlist-modal">
+            Create new Playlist <span class="glyphicon glyphicon-plus"></span>
+          </button>
+          <select class="form-control" ng-model="playlist" ng-options="playlist.title for playlist in playlists" ng-change="updatePlaylist()">
+            <option value="">-- Load Playlist --</option>
+          </select>
+        </div><!-- opacity-container -->
+        <div class="opacity-container operation-container" ng-show="playlist">
+          <ul>
+            <li>
+              <button type="button" class="btn btn-info" ng-click="playPlaylist()">
+                Play videos in YouTube <span class="glyphicon glyphicon-music"></span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="btn btn-primary" ng-click="addVideo()" ng-disabled="isFirstAccess">
+                Add playing video <span class="glyphicon glyphicon-plus"></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="playlist-videos-container opacity-container" ng-show="playlist">
+          <ul>
+            <li ng-repeat="video in videos">
+              <div class="video-container">
+                <a href="https://www.youtube.com/watch?v={{video.id}}" target="_blank">
+                  <img ng-src="http://img.youtube.com/vi/{{video.id}}/2.jpg" />
+                </a>
+                <button ng-confirm-click="Are you sure to delete {{video.title}}?"  confirmed-click="removeVideo(video.playlist_entry_id, $index)" class="delete-video btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                <div class="video-title">
+                  <a href="https://www.youtube.com/watch?v={{video.id}}" target="_blank">
+                    {{ video.title }}
+                  </a>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div><!-- playlist-videos-container -->
+        <div class="modal fade create-playlist-modal" id="create-playlist-modal" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Edit Playlist</h4>
+              </div><!-- modal-header -->
+              <div class="modal-body">
+                <ul class="nav nav-tabs">
+                  <li class="active"><a href="#create-playlist" data-toggle="tab">Create</a></li>
+                  <li><a href="#delete-playlist" data-toggle="tab">Delete</a></li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane active" id="create-playlist">
+                    <form name="searchForm" class="form" role="form">
+                      <h4>Create New Playlist</h4>
+                      <div class="form-group">
+                        <label for="new-playlist-title">Playlist Title</label>
+                        <input ng-model="newPlaylistTitle" type="text" class="form-control" id="new-playlist-title" placeholder="Enter title" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="new-playlist-description">Playlist Descriotion</label>
+                        <textarea ng-model="newPlaylistDescription" class="form-control" rows="3" placeholder="Enter description"></textarea>
+                      </div>
+                      <div>
+                        <button ng-click="createPlaylist()" type="submit" class="btn btn-primary" id="create-playlist-button" data-dismiss="modal" ng-disabled="!newPlaylistTitle.length">Create <span class="glyphicon glyphicon-plus"></span></button>
+                      </div>
+                    </form><!-- searchForm -->
+                  </div><!-- create-playlist -->
+                  <div class="tab-pane" id="delete-playlist">
+                    <h4>Delete Playlist</h4>
+                    <ul>
+                      <li ng-repeat="pl in playlists">
+                        <div class="delete-playlist-container">
+                          <div class="delete-playlist-title-container"><span class="glyphicon glyphicon-music"></span> {{pl.title}}</div>
+                          <div class="delete-playlist-button-container">
+                            <button ng-confirm-click="Are you sure to delete {{pl.title}}?" confirmed-click="deletePlaylist(pl.id, $index)" class="btn btn-danger">Delete <span class="glyphicon glyphicon-remove"></span></button>
+                          </div>
+                          <div class="delete-playlist-description-container" ng-show="pl.description.length">{{pl.description}}</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div><!-- delete-playlist -->
+                </div><!-- tab-content -->
+              </div><!-- modal-body -->
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div><!-- modal-content -->
+          </div><!-- modal-dialog -->
+        </div><!-- create-playlist-modal -->
+      </div><!-- youtube-container -->
+    <% end %>
+    </div><!-- wrapp-container -->
+  </div><!-- SearchController -->
