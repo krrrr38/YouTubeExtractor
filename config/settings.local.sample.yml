@@ -1,0 +1,11 @@
+google:
+  client_id:     ""
+  client_secret: ""
+  dev_key:       ""
+devise:
+  secret_key: ""
+gmail:
+  account: ""
+  password: ""
+secret:
+  key_base: ""

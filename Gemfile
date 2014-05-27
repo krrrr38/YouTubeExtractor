@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 
 gem 'rails', '4.1.1'
-gem 'mysql2'
 gem 'sass-rails', '~> 4.0.3'
 gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.0.0'
@@ -28,14 +27,19 @@ gem 'omniauth-google-oauth2'
 
 gem 'youtube_it', '~> 2.4.0'
 
+gem 'newrelic_rpm'
+gem 'capistrano'
+gem 'capistrano-rails'
+gem 'unicorn'
+
 group :development, :test do
+  gem 'mysql2'
   gem 'spring'
   gem 'tapp'
 end
 
 group :development do
   gem 'rails_best_practices'
-  gem 'capistrano-rails'
   gem 'guard-livereload'
   gem 'better_errors'
   gem 'binding_of_caller'
@@ -60,6 +64,9 @@ group :test do
 end
 
 group :production do
+  gem 'pg'
+  gem 'rails_12factor'
+  gem 'memcachier'
   gem 'dalli'
 end
 

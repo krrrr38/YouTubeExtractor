@@ -28,5 +28,10 @@ test:
   database: youtube_extractor_test
 
 production:
-  <<: *default
-  database: youtube_extractor_prod
+  adapter: postgresql
+  host: HOST_NAME
+  encoding: utf8
+  pool: 5
+  username: USER_NAME
+  password: PASSWORD
+  database: APP_DEV
