@@ -16,5 +16,37 @@
       <%= yield %>
     </div>
 
+    <div id="socialbuttons" class="clearfix">
+      <div class="twitter"></div>
+      <div class="facebook"></div>
+      <div class="google"></div>
+      <div class="hatena"></div>
+    </div>
+    <script type="text/javascript">
+      $(function() {
+        $("#socialbuttons .twitter").socialbutton("twitter", {
+          button : "horizontal",
+          text   : "YouTube Extractor",
+          url    : "http://youtube-extractor.herokuapp.com",
+      }).width(95);
+
+      $("#socialbuttons .facebook").socialbutton("facebook_like", {
+        button : "button_count",
+        url    : "http://youtube-extractor.herokuapp.com",
+      }).width(110);
+
+      $("#socialbuttons .google").socialbutton("google_plusone", {
+        button : "medium",
+        url    : "http://youtube-extractor.herokuapp.com",
+        count  : true,
+      }).width(70);
+
+      $("#socialbuttons .hatena").socialbutton("hatena", {
+        button : "standard",
+        url    : "http://youtube-extractor.herokuapp.com",
+        title  : "YouTube Extractor",
+      }).width(70);
+    });
+    </script>
   </body>
 </html>

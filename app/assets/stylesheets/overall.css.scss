@@ -19,6 +19,13 @@ body {
     -khtml-border-radius: 10px;
 }
 
+#socialbuttons {
+    margin-left: 30px;
+    div {
+        float: left;
+    }
+}
+
 /**************************************************/
 
 .title {
@@ -41,6 +48,7 @@ body {
     #auth-playlist-edit {
         width: 90%;
         margin: 10px;
+        max-height: 420px;
     }
     .what-we-want {
         margin: 0 20px;
