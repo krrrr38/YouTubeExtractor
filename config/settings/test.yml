@@ -1,0 +1,11 @@
+google:
+  client_id:     "test.apps.googleusercontent.com"
+  client_secret: "secret"
+  dev_key:       "devkey"
+devise:
+  secret_key: 'secret_key'
+gmail:
+  account: "hoge@fuga.piyo.com"
+  password: "password"
+secret:
+  key_base: 'foobar'

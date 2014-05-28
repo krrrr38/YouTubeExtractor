@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/krrrr38/YouTubeExtractor.svg?branch=master)](https://travis-ci.org/krrrr38/YouTubeExtractor)
+
 YouTube Extractor
 =================
 

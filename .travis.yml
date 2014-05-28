@@ -1,0 +1,13 @@
+language: ruby
+rvm:
+  - 2.0.0
+  - 2.1.1
+env:
+  - DB=mysql
+script:
+  - bundle exec rspec spec
+before_script:
+  - bundle exec rake db:create
+  - bundle exec rake db:migrate
+  - bundle exec rake db:test:prepare
+bundler_args: --without development --deployment
