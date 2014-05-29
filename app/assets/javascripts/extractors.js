@@ -272,7 +272,7 @@ angular.module('youtube-extractor-services', [])
                         onStateChange: function(event) {
                             self.state = event.data;
                             if(self.state == YT.PlayerState.ENDED) {
-                                self.play(self.playList.nextVideo().id);
+                                self.play(self.playlist.nextVideo().id);
                             } else if(self.state == -1) {
                                 $timeout(function() {
                                     if (self.state == -1) {
